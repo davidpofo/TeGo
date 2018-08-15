@@ -1,4 +1,4 @@
-1. Make a folder on your desktop called RtrainingFolder
+1.Make a folder on your desktop called RtrainingFolder
 
 2.The first three files ending in .csv or .xlsx need to be in 'raw ' before downloading.
 -first, left click the file
