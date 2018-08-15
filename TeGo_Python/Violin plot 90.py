@@ -8,3 +8,4 @@ pal = sns.cubehelix_palette(p, rot=-.5, dark=.3)
 
 # Show each distribution with both violins and points
 sns.violinplot(data=SQL_df, palette=pal, inner="points")
+title(main = "Average clicks for new vs invested users by COI", ylab="Clicks", xlab="COI")
