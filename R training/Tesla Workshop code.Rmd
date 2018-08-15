@@ -14,28 +14,27 @@ install.packages("ggplot2")
 # Library packages
 ```{r, library packages, slide 18}
 library(readr) # Read Tabular data, such as CSV files
-library(readxl) #Read excel files
-library(tidyr) #Easily Tidy data with 'spread()' and 'gather()' Functions
-library(plyr) #Tools for splitting, Applying and Combining data
+library(readxl) # Read excel files
+library(tidyr) # Easily Tidy data with 'spread()' and 'gather()' Functions
+library(plyr) # Tools for splitting, Applying and Combining data
 library(dplyr) # A grammar of data manipulation
 ```
 # Import dataset
 ```{r, slide 19}
 ## Method 1 By setting workind directory 
-# "C:/Users/flyff/Desktop/UMD/Job-Career/Tesla Gov"
-setwd("PASTE FILE FOLDER PATH HERE")
-getwd()                                     
-ACLED_df<- read.csv("ACLED data-2018-04-11-Israel-Palestine.csv")
+setwd("PASTE R TRAINING FILE FOLDER PATH HERE")
+getwd()  # Displays the curent working directory                                   
+ACLED_df <- read.csv("ACLED data-2018-04-11-Israel-Palestine.csv") # reading in the ACLED data frame
 
 ## Method 2 By inputting the full dirctory path
-ACLED_dftry2<- read.csv("C:/Users/flyff/Desktop/UMD/Job-Career/Tesla Gov/ACLED data-2018-04-11-Israel-Palestine.csv")
+# ACLED_dftry2 <- read.csv("FULL/Directory/Path")
+ACLED_dftry2 <- read.csv("C:/Users/flyff/Desktop/Tesla Gov/R training/ACLED Data-2018-04-11-Israel-Palestine.csv") # reading in the ACLED data frame
 
 identical(ACLED_df,ACLED_dftry2) #This tells you if the two data frames are identifical
-rm(ACLED_dftry2) # Removes whatever object you put in it
 ```
 ## Exercise 0
 ```{r, slide 20}
-x <- c(1:10, 1:5, NA)
+x <- c(1:10, 1:5, NA)       # c concatenates this list of two ranges 1 through 10 and 1 through 5 and a NA
 x
 length(x)                   # length of x 
 table(x)                    # Frequency counts of entries
@@ -71,13 +70,13 @@ str(ACLED_df)                 # Compactly displays the structure of an arbitrary
 
 unique(ACLED_df$actor1) #See how unique responses you have within a column
 
-library(memisc) # Library containng the codebook function
+library(memisc) # A library containng the codebook function
+
 #checking for empty responses
-ACLEDyear_codebook<-codebook(as.factor(ACLED_df$year)) # Generates a codebook of a dataset
+codebook(as.factor(ACLED_df$year)) # Generates a codebook of a dataset in this case it produces.
+# The number and percent of observations that were year 2017 and 2018
 
-ACLEDyear_codebook # The number and percent of observations that were year 2017 and 2018
-
-codebook(complete.cases(ACLED_df$year)) # Of all the observations present are any empty?
+codebook(complete.cases(ACLED_df$year)) # Of all the observations which are complete (i.e. have no misisng values)
 ```
 # Subsetting data
 ```{r, slide 23}
@@ -86,20 +85,20 @@ ACLED_df[1,1]                 # first row first column
 ACLED_df[,1]                  # first column
 ACLED_df[1,]                  # first row
 ACLED_df[,1:2]                # first 2 columns
-# Subsetting by vatiable 
-ACLED_df$fatalities
+
+# Subsetting by variable 
+ACLED_df$fatalities           # Only fatalities data
 
 # subsetting by specific criteria
-ACLED_df[which(ACLED_df$fatalities > 0),]
-ACLED_df[which(ACLED_df$source == "Agence France Presse"),]
+ACLED_df[which(ACLED_df$fatalities > 0),] # Only fatalities data above 0
+ACLED_df[which(ACLED_df$source == "Agence France Presse"),] # Only data that has the Agence France Presse source
 ```
 # Summary Report
 ```{r, slide 24}
 # Summary Report Method 1
-summary(ACLED_df)                  # Summary of each of the variables
+summary(ACLED_df)                      # Summary of each of the variables
 # Summary Report Method 2
-aggregate(ACLED_df$fatalities, by= list(ACLED_df$event_type), mean)
-# The mean of fatalities by event type
+aggregate(ACLED_df$fatalities, by= list(ACLED_df$event_type), mean) # The mean of fatalities by event type
 ```
 ## Exercise 1
 ```{r}
@@ -108,95 +107,46 @@ aggregate(ACLED_df$fatalities, by= list(ACLED_df$year, ACLED_df$event_type), sum
 
 # G2 Using actor1 how many fatalities were the Unidentified Armed Group (Palestine) involved in?
 aggregate(ACLED_df$fatalities, by= list(ACLED_df$actor1), sum)
-min(ACLED_df$fatalities)
-
+ 
 # G3 Which day had the most fatalities?
 aggregate(ACLED_df$fatalities, by= list(ACLED_df$event_date), sum)
 ```
 ## Section 2
-# Recoding  
-```{r, slide 27-29}
-# Replace the first column with the character data ID
-colnames(ACLED_df)[1]
-colnames(ACLED_df)[1]<- "data ID"
+# Recoding with the car package
+```{r, slide 27-28}
+# library the car package
+library(car) # Has the recode function
+str(ACLED_dftry2$event_type[1]) #checking what type the first row is
+# Replacing event type column with their character counterparts for recoding
+ACLED_dftry2$event_type <- as.character(ACLED_dftry2$event_type) 
 
-# Replace the first row with the character first_row
-rownames(ACLED_df)[1]
-rownames(ACLED_df)[1]<- "first_row"
+# Recode Riots/Protests event type to Civil Unrest based on text
+ACLED_dftry2$event_type <- recode(ACLED_dftry2$event_type,"'Riots/Protests' = 'Civil Unrest' ")
 
-# Replace all the data in a field with a number
-data$Grade <- 5
-
-# Replace all the data in a field with with text
-data$Grade <- "Five"
-
-# Replace all the data in a field with NA (missing data)
-data$Grade <- NA
-
-# Replace the data in a field based on equal to some value
-data$Grade[data$Grade==5] <- "Grade Five"
-
-# Or replace based on greater than or equal to some value
-data$Grade[data$Grade<=5] <- "Grade Five or Less"
-
-# Or replace based on equal to some text
-data$Grade[data$Grade=="Five"] <- "Grade Five"
-
-# Or replace only missing data
-# Note that ==NA does not work!
-data$Grade[is.na(data$Grade)] <- "Missing Grade"
+# Create a new field called New_event_types
+ACLED_dftry2$New_event_types <- recode(ACLED_dftry2$event_type,"'Riots/Protests'=Civil Unrest")
 ```
-#Recoding with the car package
-```{r}
-# Load the car package
-library(car)
-# Recode grade 5 to grade 6
-Data$Grade<-recode(Data$Grade,"5=6")
-# Recode grade 5 to grade 6 based on text
-Data$Grade<-recode(Data$Grade,"'Grade Five'=5")
-# Recode grade 5 to grade 6
-Data$Grade<-recode(Data$Grade,"c(1,2,3,4,5)='Five or Less'")
-# Create a new field called NewGrade
-Data$NewGrade <- recode(Data$Grade,"5='Elementary'")
-# Recode grade 3 to NA
-Data$Grade<-recode(Data$Grade,"3=NA")
-# Or recode NA to 7
-Data$Grade <- recode(Data$Grade,"NA=7")
-# Recode grade 5 to grade 6 and grade 6 to grade 7
-SchoolData$Grade<-recode(SchoolData$Grade,"5=6;6=7")
-# Recode grades 1 through 5 to Elementary
-SchoolData$Grade<-recode(SchoolData$Grade,"1:5='Elementary'")
-# Recode the lowest grade through 5 to Elementary
-SchoolData$Grade<-recode(SchoolData$Grade,"lo:5='Elementary'")
-
-# Recode grade 9 to the highest grade to High School
-SchoolData$Grade<-recode(SchoolData$Grade,"9:hi='High School'")
-# Recode grades
-SchoolData$Grade<-recode(SchoolData$Grade,"1:5='Elementary';6:8='Middle;else='High'")
-```
-
-## Sorting dataset
-```{r, slide 30}
+# Sorting dataset
+```{r, slide 29}
 ## Sorting data
 data[order(data$variable), ] # would not change the original data
-data.sorted <- data[order(data$var1,data$var2), ] # Sort by two vectors, and save the sorted data in a new dataset
-Acled_sorted <- ACLED_df[order(ACLED_df$source, ACLED_df$year), ] 
+data.sorted <- data[order(data$var1,data$var2), ] # Sort by two vectors, and save the sorted data in a new data frame
+Acled_sorted <- ACLED_df[order(ACLED_df$source, ACLED_df$year), ] # Sort by source and year and save the sorted data into a new data frame
 ```
 ## Exercise 2
-```{r}
+```{r, slide 30}
 # G1 Rename the column "source" to "opinion"
 colnames(ACLED_df)[25]<- "opinion"
 
 # G2 Sort the dataset by "opinion" and "year"
-
 Acled_sorted_Ex2 <- ACLED_df[order(ACLED_df$opinion, ACLED_df$year), ] 
+
 # G3 Recode all 'BBC' observations to 'BritishBeingCool'
 Acled_sorted_Ex2$opinion<-recode(Acled_sorted_Ex2$opinion,"'BBC'='BritishBeingCool'")
-
 ```
 ## Section 3
 # Mispellings/miscategorizations
-```{r, 33}
+```{r, slide 32}
 library(hunspell)
 
 words <- c("beer", "wiskey", "wine")
@@ -212,25 +162,26 @@ hunspell_suggest(words[!correct])
 # The hunspell_find function takes a character vector with text (in plain, latex or man format) and returns a list with incorrect words for each line.
 bad_words <- hunspell_find("spell checkers are not neccessairy for langauge ninja's")
 print(bad_words)
+
 # Finally hunspell_suggest is used to suggest correct alternatives for each (incorrect) input word.
 hunspell_suggest(bad_words[[1]])
 
 # Arabic example
 ar <- dictionary("C:/Users/flyff/AppData/Local/RStudio-Desktop/dictionaries/languages-user/ar.dic")
-ArabicCorrect<- "??????????"#Hello
-hunspell_check(ArabicHello,dict = ar)
-hunspell_suggest(ArabicHello,dict = ar)
-
-ArabicIncorrect <-"????????"#Jams
-hunspell_check(ArabicIncorrect,dict = ar)
-hunspell_suggest(ArabicIncorrect,dict = ar)
+library(readxl) # read in excel and xlsx files
+Arabic_df <-  read_excel("C:/Users/flyff/Desktop/Tesla Gov/R training/Cleaned STACSY-ACLED Data.xlsx")
+codebook(hunspell_check(Arabic_df$description_arabic,dict = ar))
+abrabic_des <- hunspell_find(Arabic_df$description_arabic,dict = ar)
+str(bad_words[[1]])
+hunspell_suggest(abrabic_des[2],dict = ar)
 ```
 ## Section 4
 # Merging data frames
 ```{r, 36}
-ACLED_df_2 <- read.csv("C:/Users/flyff/Desktop/UMD/Job-Career/Tesla Gov/2018-04-12-2018-08-01-Middle_East-Israel-Palestine.csv")
+ACLED_df_2 <- read.csv("C:/Users/flyff/Desktop/Tesla Gov/R training/2018-04-12-2018-08-01-Middle_East-Israel-Palestine.csv") # A second data set of ACLED data
 str(ACLED_df_2)
-Merged_ACLED_df<- rbind(ACLED_df,ACLED_df_2)
+# rbind() merges the two data frames by colnames
+Merged_ACLED_df<- rbind(ACLED_df,ACLED_df_2) # merging the two ACLED data sets
 Merged_ACLED_df
 ```
 # Plotting data
@@ -247,9 +198,7 @@ ggplot (ACLED_df, aes(x=fatalities,fill = event_type ))   +   		geom_histogram (
 ggplot (ACLED_df[ACLED_df$fatalities<2,], aes(x=fatalities,fill = event_type ))   +   		geom_histogram (position = "dodge", color = "white", binwidth = 1) 
 # Plot of the summary data
 
-
 Merged_ACLED_agg <- aggregate(Merged_ACLED_df$fatalities, by=list(Merged_ACLED_df$event_type, Merged_ACLED_df$country), mean)
-
 
 ggplot(Merged_ACLED_agg, aes(x=Group.2, y= x, fill = Group.1)) + 
   geom_bar(position = "dodge", stat="identity", color = "white")+
@@ -260,23 +209,11 @@ ggplot(Merged_ACLED_agg, aes(x=Group.2, y= x, fill = Group.1)) +
         y = "Fatalities",
         fill = "Event Type")
 ```
-## Exercise 4
-```{r}
-# Basic violin plot
-p <- ggplot(ACLED_df, aes(x=event_type, y=fatalities)) + 
-  geom_violin()
-p
-# Rotate the violin plot
-p + coord_flip()
-# Set trim argument to FALSE
-ggplot(ACLED_df, aes(x=country, y=fatalities)) + 
-  geom_violin(trim=TRUE)+ coord_flip()+ scale_y_discrete(limits=c(.5, 1)) + stat_summary(fun.y=mean, geom="point", shape=23, size=2)
-```
 ## Section 5
 ## Multiple linear regression
 ```{r}
 # A summary of the multiple linear regression of fatalities on country and event type
-summary(lm(fatalities~country + event_type, Merged_ACLED_df))
+summary(lm(fatalities~country + event_type, Merged_ACLED_df)) 
 ```
 #Country codes
 ```{r}
@@ -286,4 +223,3 @@ countrycode(c('USA', 'DZA'), 'iso3c', 'cown')
 countrycode('Albania', 'country.name', 'iso3c')
 countrycode('Albanien', 'country.name.de', 'iso.name.fr')
 ```
-
