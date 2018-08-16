@@ -1,3 +1,6 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.collections
@@ -9,20 +12,20 @@ def offset_violinplot_halves(ax, delta, width, inner, direction):
     This function offsets the halves of a violinplot to compare tails
     or to plot something else in between them. This is specifically designed
     for violinplots by Seaborn that use the option `split=True`.
-
     For lines, this works on the assumption that Seaborn plots everything with
      integers as the center.
-
     Args:
      <ax>    The axis that contains the violinplots.
      <delta> The amount of space to put between the two halves of the violinplot
      <width> The total width of the violinplot, as passed to sns.violinplot()
      <inner> The type of inner in the seaborn
      <direction> Orientation of violinplot. 'hotizontal' or 'vertical'.
-
     Returns:
      - NA, modifies the <ax> directly
     """
+    
+    
+    
     # offset stuff
     if inner == 'sticks':
         lines = ax.get_lines()
@@ -48,7 +51,7 @@ def offset_violinplot_halves(ax, delta, width, inner, direction):
                     data += delta
                 line.set_xdata(data)
 
-
+   
     for ii, item in enumerate(ax.collections):
         # axis contains PolyCollections and PathCollections
         if isinstance(item, matplotlib.collections.PolyCollection):
@@ -104,12 +107,14 @@ width = 0.75
 delta = 0.05
 final_width = width - delta
 
-sns.violinplot(data=SQL_df, x='y', y='x',
-               split=True, hue = 'z',
-               ax = ax1, inner='sticks',
-               bw = 0.2)
-sns.violinplot(data=SQL_df, x='x', y='y',
-               split=True, hue = 'z',
+SQL_df = pd.read_excel('violin_df.xlsx')
+SQL_melt_df = SQL_df.melt(id_vars=['COI'], var_name=['Clicks']).set_index(['COI', 'Clicks']).squeeze().unstack().reset_index()
+
+#transpose COI column data into 'sum of clicks' which will be x
+
+#sns.violinplot(data=SQL_melt_df, x='COI', y='Clicks')
+sns.violinplot(data=SQL_df, x='COI', y='Clicks',
+               split=True, hue = 'age_abs',
                ax = ax2, inner='sticks',
                bw = 0.2)
 
