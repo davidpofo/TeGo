@@ -119,11 +119,8 @@ SQL_df2= SQL_df[SQL_df.clicks >= 1]
 #               bw = 0.2)
                
                
-sns.violinplot(data=SQL_df2[SQL_df2.clicks <= 4], x='COI', y='clicks',
-               split=True, hue = 'age_abs', scale='count',
-               ax = ax2, inner='box', 
-               bw = 0.2)
-
+ax3 = sns.violinplot(data=SQL_df2, x='COI', y='clicks', split=True, hue = 'age_abs', scale='count', ax = ax2, inner='box', bw = 0.2)
+ax3.set_ylim([0,200])
 
 # Count Plot (a.k.a. Bar Plot)
 sns.countplot(x='COI', data=SQL_df2)# Rotate x-labels
