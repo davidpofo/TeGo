@@ -11,6 +11,25 @@ install.packages("car")
 install.packages("hunspell")
 install.packages("ggplot2")
 ```
+#Getting started
+```{r}
+#Assign values to a variable
+x <-  3
+x
+x <- 1:3
+x
+x <- c(1, 3, 7)
+x
+y <- c('a', 'b', 'c') 
+y
+z <- c(x, y) 
+z
+# Use R as a calculator
+35*40/4 
+sqrt(4) 
+9**2 
+```
+
 # Library packages
 ```{r, library packages, slide 18}
 library(readr) # Read Tabular data, such as CSV files
@@ -22,17 +41,19 @@ library(dplyr) # A grammar of data manipulation
 # Import dataset
 ```{r, slide 19}
 ## Method 1 By setting workind directory 
-setwd("PASTE R TRAINING FILE FOLDER PATH HERE")
+dir <-'C:/Users/flyff/Desktop/UMD/Job-Career/Tesla Gov/R training'
+#setwd("PASTE R TRAINING FILE FOLDER PATH HERE")
+setwd(dir)
 getwd()  # Displays the curent working directory                                   
-ACLED_df <- read.csv("ACLED data-2018-04-11-Israel-Palestine.csv") # reading in the ACLED data frame
-
-## Method 2 By inputting the full dirctory path
+# reading in the ACLED data frame
+ACLED_df <- read.csv("ACLED data-2018-04-11-Israel-Palestine.csv") 
+## Method 3 By inputting the full dirctory path
 # ACLED_dftry2 <- read.csv("FULL/Directory/Path")
-ACLED_dftry2 <- read.csv("C:/Users/flyff/Desktop/Tesla Gov/R training/ACLED Data-2018-04-11-Israel-Palestine.csv") # reading in the ACLED data frame
+ACLED_dftry2 <- read.csv("C:/Users/flyff/Desktop/UMD/Job-Career/Tesla Gov/R training/ACLED Data-2018-04-11-Israel-Palestine.csv") # reading in the ACLED data frame
 
 identical(ACLED_df,ACLED_dftry2) #This tells you if the two data frames are identifical
 ```
-## Exercise 0
+## Exercise 0, 15min
 ```{r, slide 20}
 x <- c(1:10, 1:5, NA)       # c concatenates this list of two ranges 1 through 10 and 1 through 5 and a NA
 x
@@ -73,8 +94,9 @@ unique(ACLED_df$actor1) #See how unique responses you have within a column
 library(memisc) # A library containng the codebook function
 
 #checking for empty responses
-codebook(as.factor(ACLED_df$year)) # Generates a codebook of a dataset in this case it produces.
-# The number and percent of observations that were year 2017 and 2018
+codebook(as.factor(ACLED_df$year)) # Generates a codebook of a dataset in this case it produces. The number and percent of observations that were year 2017 and 2018
+
+codebook(as.factor(ACLED_df$event_date)) # The number of events for each exact date
 
 codebook(complete.cases(ACLED_df$year)) # Of all the observations which are complete (i.e. have no misisng values)
 ```
@@ -91,6 +113,7 @@ ACLED_df$fatalities           # Only fatalities data
 
 # subsetting by specific criteria
 ACLED_df[which(ACLED_df$fatalities > 0),] # Only fatalities data above 0
+
 ACLED_df[which(ACLED_df$source == "Agence France Presse"),] # Only data that has the Agence France Presse source
 ```
 # Summary Report
@@ -98,7 +121,7 @@ ACLED_df[which(ACLED_df$source == "Agence France Presse"),] # Only data that has
 # Summary Report Method 1
 summary(ACLED_df)                      # Summary of each of the variables
 # Summary Report Method 2
-aggregate(ACLED_df$fatalities, by= list(ACLED_df$event_type), mean) # The mean of fatalities by event type
+aggregate(ACLED_df$fatalities, by= list(ACLED_df$event_type), sum) # The sum of fatalities by event type
 ```
 ## Exercise 1
 ```{r}
@@ -116,33 +139,42 @@ aggregate(ACLED_df$fatalities, by= list(ACLED_df$event_date), sum)
 ```{r, slide 27-28}
 # library the car package
 library(car) # Has the recode function
-str(ACLED_dftry2$event_type[1]) #checking what type the first row is
+unique(ACLED_dftry2$event_type)
+
+str(ACLED_dftry2$event_type[1]) #checking what type the first row is by factor number
+
+str(as.character(ACLED_dftry2$event_type[1])) #checking what type the first row is by converting to character first
+
 # Replacing event type column with their character counterparts for recoding
 ACLED_dftry2$event_type <- as.character(ACLED_dftry2$event_type) 
 
 # Recode Riots/Protests event type to Civil Unrest based on text
 ACLED_dftry2$event_type <- recode(ACLED_dftry2$event_type,"'Riots/Protests' = 'Civil Unrest' ")
 
-# Create a new field called New_event_types
-ACLED_dftry2$New_event_types <- recode(ACLED_dftry2$event_type,"'Riots/Protests'=Civil Unrest")
+# Create a new column called New_event_types
+ACLED_dftry2$New_event_types<-recode(ACLED_dftry2$event_type,"'Riots/Protests' = 'Civil Unrest' ")
 ```
 # Sorting dataset
 ```{r, slide 29}
 ## Sorting data
+####### Theory of data sorting
 data[order(data$variable), ] # would not change the original data
 data.sorted <- data[order(data$var1,data$var2), ] # Sort by two vectors, and save the sorted data in a new data frame
+####### Example of data sorting
 Acled_sorted <- ACLED_df[order(ACLED_df$source, ACLED_df$year), ] # Sort by source and year and save the sorted data into a new data frame
 ```
 ## Exercise 2
 ```{r, slide 30}
 # G1 Rename the column "source" to "opinion"
-colnames(ACLED_df)[25]<- "opinion"
+colnames(ACLED_dftry2)[25]<- "opinion"
 
 # G2 Sort the dataset by "opinion" and "year"
-Acled_sorted_Ex2 <- ACLED_df[order(ACLED_df$opinion, ACLED_df$year), ] 
+Acled_sorted_Ex2 <- ACLED_df[order(ACLED_dftry2$opinion, ACLED_dftry2$year), ] 
 
 # G3 Recode all 'BBC' observations to 'BritishBeingCool'
 Acled_sorted_Ex2$opinion<-recode(Acled_sorted_Ex2$opinion,"'BBC'='BritishBeingCool'")
+
+rm(Acled_sorted,Acled_sorted_Ex2) # Removes the data or value from memory (the environment)
 ```
 ## Section 3
 # Mispellings/miscategorizations
@@ -151,8 +183,6 @@ library(hunspell)
 
 words <- c("beer", "wiskey", "wine")
 # Checks individual words
-hunspell_check(words)
- 
 correct <- hunspell_check(words)
 correct # Correct words
 
@@ -161,25 +191,29 @@ hunspell_suggest(words[!correct])
 
 # The hunspell_find function takes a character vector with text (in plain, latex or man format) and returns a list with incorrect words for each line.
 bad_words <- hunspell_find("spell checkers are not neccessairy for langauge ninja's")
-print(bad_words)
+bad_words
 
 # Finally hunspell_suggest is used to suggest correct alternatives for each (incorrect) input word.
-hunspell_suggest(bad_words[[1]])
+hunspell_suggest(bad_words[1])
 
 # Arabic example
 ar <- dictionary("C:/Users/flyff/AppData/Local/RStudio-Desktop/dictionaries/languages-user/ar.dic")
 library(readxl) # read in excel and xlsx files
-Arabic_df <-  read_excel("C:/Users/flyff/Desktop/Tesla Gov/R training/Cleaned STACSY-ACLED Data.xlsx")
-codebook(hunspell_check(Arabic_df$description_arabic,dict = ar))
-abrabic_des <- hunspell_find(Arabic_df$description_arabic,dict = ar)
-str(bad_words[[1]])
-hunspell_suggest(abrabic_des[2],dict = ar)
+# reading in arabic data
+Arabic_df <-  read_excel("C:/Users/flyff/Desktop/UMD/Job-Career/Tesla Gov/R training/Cleaned STACSY-ACLED Data.xlsx")
+
+codebook(hunspell_check(Arabic_df$description_arabic,dict = ar))# produces a codebook of descriptions that are completely correct using the Arabic dictionary loaded
+
+abrabic_des <- hunspell_find(Arabic_df$description_arabic,dict = ar)# returns the incorrect arabic words for each line
+abrabic_des # The whole list of rows with an incorrect word pointed out or character (0) if there is no suggestion
+abrabic_des[2] # Allows you to look at a single line that may or may not have a suggested word
+hunspell_suggest(as.character(abrabic_des[2]),dict = ar)# Suggest alternatives for the input incorrect words
 ```
 ## Section 4
 # Merging data frames
 ```{r, 36}
-ACLED_df_2 <- read.csv("C:/Users/flyff/Desktop/Tesla Gov/R training/2018-04-12-2018-08-01-Middle_East-Israel-Palestine.csv") # A second data set of ACLED data
-str(ACLED_df_2)
+ACLED_df_2 <- read.csv("C:/Users/flyff/Desktop/UMD/Job-Career/Tesla Gov/R training/2018-04-12-2018-08-01-Middle_East-Israel-Palestine.csv") # A second data set of ACLED data
+# str(ACLED_df_2) if you wanted to check out this dataframe's structure
 # rbind() merges the two data frames by colnames
 Merged_ACLED_df<- rbind(ACLED_df,ACLED_df_2) # merging the two ACLED data sets
 Merged_ACLED_df
@@ -188,21 +222,20 @@ Merged_ACLED_df
 ```{r}
 library(ggplot2)
 # Barplot, Good.
-barplot(table(Merged_ACLED_df$event_type), xlab = "Event Type", ylab = "Frequency")
-title(main = list("Frequency of Events via Merged ACLED data", font = 4))
+barplot(table(Merged_ACLED_df$event_type), xlab = "Event Type", ylab = "Frequency")# plotting the frequency of events
+title(main = list("Frequency of Events via Merged ACLED data", font = 4)) # adds a title to the plot you just made
 # Histogram, Better.
 ggplot (ACLED_df, aes(x=fatalities,fill = event_type ))   +   		geom_histogram ()
 # Hisogram with more arguments, Best.
 ggplot (ACLED_df, aes(x=fatalities,fill = event_type ))   +   		geom_histogram (position = "dodge", color = "white", binwidth = 1) 
 # Even better than the tbest
 ggplot (ACLED_df[ACLED_df$fatalities<2,], aes(x=fatalities,fill = event_type ))   +   		geom_histogram (position = "dodge", color = "white", binwidth = 1) 
-# Plot of the summary data
-
+# summarizing fatalities by event type and country
 Merged_ACLED_agg <- aggregate(Merged_ACLED_df$fatalities, by=list(Merged_ACLED_df$event_type, Merged_ACLED_df$country), mean)
-
+# Plot of the summarized data
 ggplot(Merged_ACLED_agg, aes(x=Group.2, y= x, fill = Group.1)) + 
   geom_bar(position = "dodge", stat="identity", color = "white")+
-  labs( title = "Fatalities by Area",
+  labs( title = "Fatalities by Country",
         subtitle = " ",
         caption = " ",
         x = "Country",
@@ -215,6 +248,11 @@ ggplot(Merged_ACLED_agg, aes(x=Group.2, y= x, fill = Group.1)) +
 # A summary of the multiple linear regression of fatalities on country and event type
 summary(lm(fatalities~country + event_type, Merged_ACLED_df)) 
 ```
+# Write a dataframe to the current directory in csv format
+```{r}
+write.csv(Merged_ACLED_df, 'ACLED_Merged.csv')
+```
+
 #Country codes
 ```{r}
 # install.packages(countrycode)
