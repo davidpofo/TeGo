@@ -225,11 +225,12 @@ library(ggplot2)
 barplot(table(Merged_ACLED_df$event_type), xlab = "Event Type", ylab = "Frequency")# plotting the frequency of events
 title(main = list("Frequency of Events via Merged ACLED data", font = 4)) # adds a title to the plot you just made
 # Histogram, Better.
-ggplot (ACLED_df, aes(x=fatalities,fill = event_type ))   +   		geom_histogram ()
+ggplot (ACLED_df, aes(x=fatalities,fill = event_type ))   + geom_histogram ()
 # Hisogram with more arguments, Best.
-ggplot (ACLED_df, aes(x=fatalities,fill = event_type ))   +   		geom_histogram (position = "dodge", color = "white", binwidth = 1) 
-# Even better than the tbest
-ggplot (ACLED_df[ACLED_df$fatalities<2,], aes(x=fatalities,fill = event_type ))   +   		geom_histogram (position = "dodge", color = "white", binwidth = 1) 
+ggplot (ACLED_df, aes(x=fatalities,fill = event_type ))   +	geom_histogram (position = "dodge", color = "white", binwidth = 1) + ggtitle("Frequency of less than two Fatalities by Event type") 
+# Even better than the best
+ggplot (ACLED_df[ACLED_df$fatalities<2,], aes(x=fatalities,fill = event_type ))   +	geom_histogram (position = "dodge", color = "white", binwidth = 1) + theme_bw() + labs( title = "Frequency of less than two Fatalities by Event type", x = "Fatalities", y = "Frequency", fill = "Event Type")
+
 # summarizing fatalities by event type and country
 Merged_ACLED_agg <- aggregate(Merged_ACLED_df$fatalities, by=list(Merged_ACLED_df$event_type, Merged_ACLED_df$country), mean)
 # Plot of the summarized data
